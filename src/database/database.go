@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	_ "github.com/lib/pq"
+	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -43,6 +44,14 @@ func GetDatabase() *sql.DB {
 }
 
 func RegisterUser(username, password string) error {
+	if len(username) < 3 {
+		return errors.Errorf("username must be at least 3 characters long")
+	}
+
+	if len(password) < 8 {
+		return errors.Errorf("password must be at least 8 characters long")
+	}
+
 	var exists bool
 	err := GetDatabase().QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE username = $1)", username).Scan(&exists)
 	if err != nil {
