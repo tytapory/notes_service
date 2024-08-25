@@ -1,35 +1,32 @@
-package main
+package server
 
 import (
-	"fmt"
 	"net/http"
 )
 
 type pushRequest struct {
-	Key  string `json:"key"`
-	Note string `json:"note"`
+	Credentials credentials `json:"credentials"`
+	Note        string      `json:"note"`
 }
 
 type getRequest struct {
-	Key string `json:"key"`
+	Credentials credentials `json:"credentials"`
 }
 
 type getResponce struct {
 	Notes []string `json:"notes"`
 }
 
+type credentials struct {
+	Login    string `json:"login"`
+	Password string `json:"password"`
+}
+
 type failureResponce struct {
-	Err string `json:"error"`
+	Error string `json:"error"`
 }
 
-func main() {
-	err := runServer()
-	if err != nil {
-		fmt.Print(err.Error())
-	}
-}
-
-func runServer() error {
+func Run() error {
 	plugInHandlers()
 	return http.ListenAndServe(":80", nil)
 }
