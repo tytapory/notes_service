@@ -2,10 +2,10 @@ package database
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 
 	_ "github.com/lib/pq"
-	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -25,31 +25,13 @@ var (
 	dbInstance *sql.DB
 )
 
-func ConnectToDatabase(dbUser, dbName, dbPassword string) error {
-	connectionString := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", dbUser, dbPassword, dbName)
-	var err error
-	dbInstance, err = sql.Open("postgres", connectionString)
-	if err != nil {
-		return err
-	}
-
-	if err = dbInstance.Ping(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func GetDatabase() *sql.DB {
-	return dbInstance
-}
-
 func RegisterUser(username, password string) error {
 	if len(username) < 3 {
-		return errors.Errorf("username must be at least 3 characters long")
+		return errors.New("username must be at least 3 characters long")
 	}
 
 	if len(password) < 8 {
-		return errors.Errorf("password must be at least 8 characters long")
+		return errors.New("password must be at least 8 characters long")
 	}
 
 	var exists bool
@@ -99,6 +81,17 @@ func GetUserNotes(UserID int) ([]string, error) {
 	return notes, nil
 }
 
+func InsertUserNote(userID int, noteText string) error {
+	query := `INSERT INTO user_notes (user_id, note_text) VALUES ($1, $2)`
+
+	_, err := GetDatabase().Exec(query, userID, noteText)
+	if err != nil {
+		return fmt.Errorf("error inserting user note: %v", err)
+	}
+
+	return nil
+}
+
 func Authenticate(username, password string) (int, error) {
 	hashedPassword, err := getHashedPassword(username)
 	if err != nil {
@@ -127,17 +120,6 @@ func getHashedPassword(username string) (string, error) {
 
 }
 
-func InsertUserNote(userID int, noteText string) error {
-	query := `INSERT INTO user_notes (user_id, note_text) VALUES ($1, $2)`
-
-	_, err := GetDatabase().Exec(query, userID, noteText)
-	if err != nil {
-		return fmt.Errorf("error inserting user note: %v", err)
-	}
-
-	return nil
-}
-
 func getUserIDByUsername(username string) (int, error) {
 	query := `SELECT user_id FROM users WHERE username = $1`
 
@@ -164,4 +146,22 @@ func hashPassword(password string) (string, error) {
 func checkPasswordHash(password, hashedPassword string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 	return err == nil
+}
+
+func ConnectToDatabase(dbUser, dbName, dbPassword string) error {
+	connectionString := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", dbUser, dbPassword, dbName)
+	var err error
+	dbInstance, err = sql.Open("postgres", connectionString)
+	if err != nil {
+		return err
+	}
+
+	if err = dbInstance.Ping(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func GetDatabase() *sql.DB {
+	return dbInstance
 }

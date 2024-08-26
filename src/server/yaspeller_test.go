@@ -1,14 +1,28 @@
 package server
 
 import (
-	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-func TestVerify(t *testing.T) {
-	str, err := verify("ghdtn      пивет ult ты\nзнаешь я тебя люблю\nvjz vfv тестируем текст д да да урасЖцс")
-	fmt.Printf("%s", str)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
+func TestValidate_NormalInput(t *testing.T) {
+	str, err := validateAndFixErrors("ghdtn      пивет ult ты\nзнаешь я тебя люблю\nvjz vfv тестируем текст д да да урасЖцс")
+	expected := "привет      привет где ты\nзнаешь я тебя люблю\nмоя мам тестируем текст д да да урасЖцс"
+	assert.Nil(t, err)
+	assert.Equal(t, str, expected)
+}
+
+func TestValidate_EmptyInput(t *testing.T) {
+	str, err := validateAndFixErrors("")
+	expected := ""
+	assert.Nil(t, err)
+	assert.Equal(t, str, expected)
+}
+
+func TestValidate_InvalidCharacters(t *testing.T) {
+	str, err := validateAndFixErrors("1234567890 !@#$%^&*()")
+	expected := "1234567890 !@#$%^&*()"
+	assert.Nil(t, err)
+	assert.Equal(t, str, expected)
 }
