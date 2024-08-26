@@ -58,7 +58,7 @@ func RegisterUser(username, password string) error {
 		return err
 	}
 	if exists {
-		return err
+		return fmt.Errorf("user with username %s already exists", username)
 	}
 
 	hashedPassword, err := hashPassword(password)

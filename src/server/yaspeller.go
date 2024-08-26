@@ -18,7 +18,7 @@ type wordCorrection struct {
 	S    []string `json:"s"`
 }
 
-func verify(note string) (string, error) {
+func validateAndFixErrors(note string) (string, error) {
 	corrections, err := getCorrections(note)
 	if err != nil {
 		return "", err
