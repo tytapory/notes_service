@@ -117,7 +117,6 @@ func getHashedPassword(username string) (string, error) {
 	}
 
 	return passwordHash, nil
-
 }
 
 func getUserIDByUsername(username string) (int, error) {
