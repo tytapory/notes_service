@@ -99,7 +99,7 @@ func register(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("INFO: User %s successfully registered", request.Credentials.Username)
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(registerResponse{Message: "User successfully regustered"})
+	json.NewEncoder(w).Encode(registerResponse{Message: "User successfully registered"})
 }
 
 func pushNote(w http.ResponseWriter, r *http.Request) {

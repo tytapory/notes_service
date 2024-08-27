@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	dbUser := flag.String("dbuser", "postgres", "Username for the database")
+	dbUser := flag.String("dbuser", "notes_service", "Username for the database")
 	dbName := flag.String("dbname", "notes", "Name of the database")
 	dbPassword := flag.String("dbpassword", "password", "Password for the database")
 	flag.Parse()

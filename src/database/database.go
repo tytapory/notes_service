@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"os"
 
 	_ "github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
@@ -101,7 +102,7 @@ func Authenticate(username, password string) (int, error) {
 		userID, err := getUserIDByUsername(username)
 		return userID, err
 	} else {
-		return -1, fmt.Errorf("incorrect credentials")
+		return -1, fmt.Errorf("invalid credentials")
 	}
 }
 
@@ -148,7 +149,17 @@ func checkPasswordHash(password, hashedPassword string) bool {
 }
 
 func ConnectToDatabase(dbUser, dbName, dbPassword string) error {
-	connectionString := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", dbUser, dbPassword, dbName)
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
+	if dbHost == "" {
+		dbHost = "127.0.0.1"
+	}
+
+	if dbPort == "" {
+		dbPort = "5432"
+	}
+
+	connectionString := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=disable", dbUser, dbPassword, dbName, dbHost, dbPort)
 	var err error
 	dbInstance, err = sql.Open("postgres", connectionString)
 	if err != nil {

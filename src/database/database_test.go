@@ -1,13 +1,15 @@
 package database
 
 import (
-	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestHashPassword(t *testing.T) {
 	password := "password"
 
 	hashedPassword, _ := hashPassword(password)
-	fmt.Println(hashedPassword)
+	assert.True(t, checkPasswordHash(password, hashedPassword))
+	assert.False(t, checkPasswordHash("invalid", hashedPassword))
 }
